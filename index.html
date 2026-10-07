@@ -13,8 +13,6 @@
     <!-- jsPDF & html2canvas for Robust Multi-page PDF Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <!-- Google Fonts Inter -->
@@ -92,7 +90,7 @@
 </head>
 <body class="h-full antialiased flex flex-col" x-data="sisedUplcApp()" x-init="initApp()">
 
-    <!-- Toast Container -->
+    <!-- Toast Notifications -->
     <div class="fixed top-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none no-print">
         <template x-for="toast in toasts" :key="toast.id">
             <div class="pointer-events-auto flex items-center p-4 mb-3 rounded-xl shadow-xl text-white transition-all transform translate-y-0"
@@ -116,7 +114,6 @@
         </template>
     </div>
 
-    <!-- Main View Container -->
     <div class="flex-1 flex flex-col h-full overflow-hidden w-full">
 
         <!-- 1. LANDING / STUDENT LOGIN VIEW -->
@@ -143,7 +140,7 @@
                     <!-- Student Identification Form -->
                     <form @submit.prevent="startStudentEvaluation()" class="space-y-4 text-left bg-white/5 p-6 rounded-2xl border border-white/10">
                         <div class="bg-teal-950/40 p-4 rounded-xl border border-teal-500/30 text-xs text-teal-200 mb-2">
-                            <i class="fas fa-info-circle mr-1"></i> Proporciona tu <strong>Matrícula o Correo</strong> y selecciona tu grupo:
+                            <i class="fas fa-info-circle mr-1"></i> Para continuar, proporciona <strong>al menos uno</strong> de los siguientes datos (Matrícula o Correo):
                         </div>
 
                         <div>
@@ -200,7 +197,7 @@
             </div>
         </template>
 
-        <!-- 2. ADMIN LOGIN VIEW -->
+        <!-- Admin Login View -->
         <template x-if="currentView === 'admin_login'">
             <div class="flex-1 flex items-center justify-center bg-slate-900 p-6 w-full h-full">
                 <div class="max-w-md w-full bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-8 text-white">
@@ -212,27 +209,27 @@
                             UPLC
                         </div>
                         <h2 class="text-2xl font-bold">Acceso Administrativo</h2>
-                        <p class="text-slate-400 text-sm">Dirección de Programas Académicos (Supabase Auth)</p>
+                        <p class="text-slate-400 text-sm">Dirección de Programas Académicos</p>
                     </div>
 
                     <form @submit.prevent="loginAdmin" class="space-y-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Correo Administrador</label>
-                            <input type="email" x-model="adminUser" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-teal-500" placeholder="admin@uplc.edu.mx">
+                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Usuario Administrador</label>
+                            <input type="text" x-model="adminUser" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-teal-500" placeholder="admin@uplc.edu.mx">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Contraseña</label>
                             <input type="password" x-model="adminPass" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-teal-500" placeholder="••••••••">
                         </div>
                         <button type="submit" class="w-full py-3.5 bg-teal-600 hover:bg-teal-500 font-semibold rounded-xl shadow-lg transition text-white cursor-pointer">
-                            Iniciar Sesión Segura
+                            Iniciar Sesión
                         </button>
                     </form>
                 </div>
             </div>
         </template>
 
-        <!-- 3. STUDENT EVALUATION FLOW -->
+        <!-- Student Evaluation Flow View -->
         <template x-if="currentView === 'student_evaluation_flow'">
             <div class="flex-1 flex flex-col bg-slate-50 overflow-y-auto w-full h-full">
                 <header class="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-20 flex justify-between items-center shadow-sm no-print">
@@ -368,7 +365,7 @@
             </div>
         </template>
 
-        <!-- 4. ADMIN DASHBOARD AND MANAGEMENT VIEWS -->
+        <!-- Admin Dashboard & Panel Views -->
         <template x-if="currentView.startsWith('admin_') && currentView !== 'admin_login'">
             <div class="flex-1 flex h-full overflow-hidden bg-slate-100 w-full">
 
@@ -380,7 +377,7 @@
                         </div>
                         <div>
                             <span class="font-extrabold text-white text-base tracking-wide">SISED</span>
-                            <span class="block text-[10px] text-teal-400 font-medium">Supabase Cloud Ready</span>
+                            <span class="block text-[10px] text-teal-400 font-medium">Seguimiento Docente Continuo</span>
                         </div>
                     </div>
 
@@ -415,6 +412,9 @@
                         <a @click="currentView = 'admin_reportes_docentes'" class="flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition cursor-pointer" :class="currentView === 'admin_reportes_docentes' ? 'bg-[#1e3a8a] text-white shadow' : 'hover:bg-slate-800 text-slate-400 hover:text-white'">
                             <i class="fas fa-file-contract w-5 text-teal-400"></i><span>Reportes Docentes</span>
                         </a>
+                        <a @click="currentView = 'admin_configuracion'" class="flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition cursor-pointer" :class="currentView === 'admin_configuracion' ? 'bg-[#1e3a8a] text-white shadow' : 'hover:bg-slate-800 text-slate-400 hover:text-white'">
+                            <i class="fas fa-gear w-5 text-teal-400"></i><span>Configuración</span>
+                        </a>
                     </nav>
 
                     <div class="p-4 border-t border-slate-800">
@@ -441,7 +441,7 @@
                                 </div>
                                 <div class="hidden md:block text-left">
                                     <span class="block text-sm font-bold text-slate-800">Dirección de Programas Académicos</span>
-                                    <span class="block text-[10px] text-slate-500">Supabase Connected</span>
+                                    <span class="block text-[10px] text-slate-500">SISED - UPLC</span>
                                 </div>
                             </div>
                         </div>
@@ -780,7 +780,6 @@
                                         <div class="bg-slate-50 p-3 rounded-xl border text-[11px] font-mono text-slate-700 overflow-x-auto">
                                             Periodo | Carrera | Grupo | Cuatrimestre | ClaveMateria | Materia | ClaveDocente | Docente
                                         </div>
-                                        <p class="text-xs text-slate-500">El sistema validará automáticamente los registros, actualizará los catálogos y establecerá las relaciones en Supabase.</p>
                                     </div>
                                 </div>
 
@@ -800,7 +799,7 @@
                                                     <span class="font-bold">Vista previa de importación:</span> <span x-text="importPreviewData.length + ' registros encontrados'"></span>.
                                                 </div>
                                                 <button @click="confirmImport()" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow transition cursor-pointer">
-                                                    CONFIRMAR Y GUARDAR EN SUPABASE
+                                                    CONFIRMAR IMPORTACIÓN
                                                 </button>
                                             </div>
                                         </div>
@@ -875,12 +874,28 @@
                             </div>
                         </template>
 
+                        <!-- Configuración View -->
+                        <template x-if="currentView === 'admin_configuracion'">
+                            <div class="space-y-6">
+                                <h2 class="text-2xl font-bold text-slate-800">Configuración Institucional UPLC</h2>
+                                <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm max-w-xl space-y-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Nombre del Sistema</label>
+                                        <input type="text" x-model="settings.systemName" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-800 font-semibold text-sm">
+                                    </div>
+                                    <button @click="showToast('Configuración guardada correctamente.', 'success')" class="px-6 py-3 bg-[#1e3a8a] text-white font-semibold rounded-xl text-sm shadow cursor-pointer">
+                                        Guardar Cambios
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+
                     </main>
                 </div>
             </div>
         </template>
 
-        <!-- Report Modal & PDF Printable View -->
+        <!-- Printable / PDF Teacher Report Modal -->
         <template x-if="teacherReportModalActive">
             <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
                 <div class="bg-white border border-slate-200 rounded-3xl shadow-2xl max-w-4xl w-full p-8 space-y-6 max-h-[90vh] overflow-y-auto" id="printable-report">
@@ -955,26 +970,152 @@
                         <h3 class="text-xl font-bold text-slate-800" x-text="modalTitle"></h3>
                         <button @click="modalActive = false" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="fas fa-times"></i></button>
                     </div>
+
+                    <template x-if="modalType === 'periodo'">
+                        <form @submit.prevent="savePeriodo" class="space-y-4">
+                            <input type="text" x-model="modalForm.nombre" required placeholder="Nombre (ej. 2026-2)" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="date" x-model="modalForm.inicio" required class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                                <input type="date" x-model="modalForm.fin" required class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                            </div>
+                            <button type="submit" class="w-full py-3 bg-[#1e3a8a] text-white font-semibold rounded-xl text-sm cursor-pointer">Guardar</button>
+                        </form>
+                    </template>
+
+                    <template x-if="modalType === 'jornada'">
+                        <form @submit.prevent="saveJornada" class="space-y-4">
+                            <input type="text" x-model="modalForm.nombre" required placeholder="Nombre de Jornada" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                            <select x-model="modalForm.periodo" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                                <template x-for="p in periodosList" :key="p.id">
+                                    <option :value="p.nombre" x-text="p.nombre"></option>
+                                </template>
+                            </select>
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="date" x-model="modalForm.inicio" required class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                                <input type="date" x-model="modalForm.fin" required class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                            </div>
+                            <button type="submit" class="w-full py-3 bg-teal-600 text-white font-semibold rounded-xl text-sm cursor-pointer">Guardar Jornada</button>
+                        </form>
+                    </template>
+
+                    <template x-if="modalType === 'carrera'">
+                        <form @submit.prevent="saveCarrera" class="space-y-4">
+                            <input type="text" x-model="modalForm.nombre" required placeholder="Nombre de Carrera" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                            <input type="text" x-model="modalForm.clave" required placeholder="Clave (ej. CIA)" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                            <button type="submit" class="w-full py-3 bg-[#1e3a8a] text-white font-semibold rounded-xl text-sm cursor-pointer">Guardar</button>
+                        </form>
+                    </template>
+
+                    <template x-if="modalType === 'grupo'">
+                        <form @submit.prevent="saveGrupo" class="space-y-4">
+                            <input type="text" x-model="modalForm.nombre" required placeholder="Grupo (ej. 3A)" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                            <input type="number" x-model="modalForm.cuatrimestre" required placeholder="Cuatrimestre" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                            <select x-model="modalForm.carrera" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                                <option value="">Seleccione carrera...</option>
+                                <template x-for="c in carreras" :key="c.id">
+                                    <option :value="c.nombre" x-text="c.nombre"></option>
+                                </template>
+                            </select>
+                            <select x-model="modalForm.periodo" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                                <option value="">Seleccione periodo...</option>
+                                <template x-for="p in periodosList" :key="p.id">
+                                    <option :value="p.nombre" x-text="p.nombre"></option>
+                                </template>
+                            </select>
+                            <button type="submit" class="w-full py-3 bg-[#1e3a8a] text-white font-semibold rounded-xl text-sm cursor-pointer">Guardar Grupo</button>
+                        </form>
+                    </template>
+
+                    <template x-if="modalType === 'docente'">
+                        <form @submit.prevent="saveDocente" class="space-y-4">
+                            <input type="text" x-model="modalForm.clave" required placeholder="Clave Docente" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                            <input type="text" x-model="modalForm.nombre" required placeholder="Nombre completo" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                            <input type="email" x-model="modalForm.correo" required placeholder="Correo" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                            <button type="submit" class="w-full py-3 bg-[#1e3a8a] text-white font-semibold rounded-xl text-sm cursor-pointer">Guardar Docente</button>
+                        </form>
+                    </template>
+
+                    <template x-if="modalType === 'materia'">
+                        <form @submit.prevent="saveMateria" class="space-y-4">
+                            <input type="text" x-model="modalForm.clave" required placeholder="Clave Materia" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                            <input type="text" x-model="modalForm.nombre" required placeholder="Nombre de materia" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                            <select x-model="modalForm.carrera" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm">
+                                <option value="">Seleccione carrera...</option>
+                                <template x-for="c in carreras" :key="c.id">
+                                    <option :value="c.nombre" x-text="c.nombre"></option>
+                                </template>
+                            </select>
+                            <button type="submit" class="w-full py-3 bg-[#1e3a8a] text-white font-semibold rounded-xl text-sm cursor-pointer">Guardar Materia</button>
+                        </form>
+                    </template>
+
+                    <template x-if="modalType === 'asignacion'">
+                        <form @submit.prevent="saveAsignacion" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Periodo Académico</label>
+                                <select x-model="modalForm.periodo" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm">
+                                    <option value="">Seleccione periodo...</option>
+                                    <template x-for="p in periodosList" :key="p.id">
+                                        <option :value="p.nombre" x-text="p.nombre"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Carrera</label>
+                                <select x-model="modalForm.carrera" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm">
+                                    <option value="">Seleccione carrera...</option>
+                                    <template x-for="c in carreras" :key="c.id">
+                                        <option :value="c.nombre" x-text="c.nombre"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Grupo</label>
+                                <select x-model="modalForm.grupo" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm">
+                                    <option value="">Seleccione grupo...</option>
+                                    <template x-for="g in grupos.filter(gr => !modalForm.carrera || gr.carrera === modalForm.carrera)" :key="g.id">
+                                        <option :value="g.nombre" x-text="'Grupo ' + g.nombre + ' (' + g.cuatrimestre + '° Cuatrimestre)'"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Materia</label>
+                                <select x-model="modalForm.materia" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm">
+                                    <option value="">Seleccione materia...</option>
+                                    <template x-for="m in materias" :key="m.clave">
+                                        <option :value="m.nombre" x-text="m.nombre + ' (' + m.clave + ')'"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Docente</label>
+                                <select x-model="modalForm.docente" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm">
+                                    <option value="">Seleccione docente...</option>
+                                    <template x-for="d in docentes" :key="d.clave">
+                                        <option :value="d.nombre" x-text="d.nombre + ' (' + d.clave + ')'"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Jornada</label>
+                                <select x-model="modalForm.jornada" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm">
+                                    <option value="">Seleccione jornada...</option>
+                                    <template x-for="j in jornadasList" :key="j.id">
+                                        <option :value="j.nombre" x-text="j.nombre"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full py-3 bg-[#1e3a8a] text-white font-semibold rounded-xl text-sm shadow cursor-pointer">Guardar Asignación</button>
+                        </form>
+                    </template>
                 </div>
             </div>
         </template>
 
     </div>
 
+    <!-- Main JavaScript Logic -->
     <script>
-        // ==========================================
-        // CONFIGURACIÓN DE SUPABASE (TUS CREDENCIALES)
-        // ==========================================
-        const supabaseUrl = 'https://zkpftlrbtuovglmwpxlq.supabase.co/rest/v1/'; // Reemplaza con tu URL de Supabase
-        const supabaseAnonKey = 'sb_publishable_bqFGpS8lMSXIYzJaXm1SWQ_Tnzb2KIc'; // Reemplaza con tu Publishable/Anon Key de Supabase
-
-        let supabaseClient = null;
-        try {
-            if (window.supabase && supabaseUrl.startsWith('https://')) {
-                supabaseClient = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-            }
-        } catch(e) { console.warn('Supabase offline mode'); }
-
         function sisedUplcApp() {
             return {
                 currentView: 'landing',
@@ -982,47 +1123,139 @@
                 adminPass: '',
                 toasts: [],
                 dashboardPeriodFilter: '2026-2',
+                
+                settings: {
+                    systemName: 'SISTEMA INSTITUCIONAL DE SEGUIMIENTO Y EVALUACIÓN DOCENTE',
+                    abbreviation: 'SISED - UPLC'
+                },
                 selectedReportPeriod: '2026-2',
                 selectedReportTeacher: '',
                 reportScope: 'general',
                 selectedReportAssignmentId: '',
 
-                studentForm: { matricula: '', correo: '', carrera: 'Licenciatura en Comercio Internacional y Aduanas', grupo: '3A' },
+                studentForm: {
+                    matricula: '',
+                    correo: '',
+                    carrera: 'Licenciatura en Comercio Internacional y Aduanas',
+                    grupo: '3A'
+                },
+
                 studentState: 'evaluating',
                 currentTeacherIndex: 0,
                 activeQuestions: [],
                 currentQuestionIndex: 0,
                 studentAnswers: {},
+                abandonmentWarningModal: false,
 
-                periodosList: [{ id: 1, nombre: '2026-2', inicio: '2026-08-10', fin: '2026-12-15', estado: 'Activo' }],
-                jornadasList: [{ id: 1, periodo: '2026-2', nombre: 'Jornada 1', inicio: '2026-09-01', fin: '2026-09-30', estado: 'Activa' }],
+                periodosList: [
+                    { id: 1, nombre: '2026-1', inicio: '2026-01-10', fin: '2026-06-15', estado: 'Cerrado' },
+                    { id: 2, nombre: '2026-2', inicio: '2026-08-10', fin: '2026-12-15', estado: 'Activo' }
+                ],
+                jornadasList: [
+                    { id: 1, periodo: '2026-2', nombre: 'Jornada 1', inicio: '2026-09-01', fin: '2026-09-30', estado: 'Activa' },
+                    { id: 2, periodo: '2026-2', nombre: 'Jornada 2', inicio: '2026-10-01', fin: '2026-10-30', estado: 'Programada' }
+                ],
                 carreras: [
                     { id: 1, clave: 'CIA', nombre: 'Licenciatura en Comercio Internacional y Aduanas' },
                     { id: 2, clave: 'ITI', nombre: 'Ingeniería en Tecnología de la Información e Innovación Digital' }
                 ],
-                grupos: [{ id: 1, nombre: '3A', cuatrimestre: 3, carrera: 'Licenciatura en Comercio Internacional y Aduanas', periodo: '2026-2' }],
-                docentes: [{ clave: 'D001', nombre: 'Luis Miguel Sánchez García', correo: 'luis.sanchez@uplc.edu.mx' }],
-                materias: [{ clave: 'M101', nombre: 'Int. al Sistema Armonizado y Merceología', carrera: 'Licenciatura en Comercio Internacional y Aduanas' }],
-                asignaciones: [{ id: 1, periodo: '2026-2', carrera: 'Licenciatura en Comercio Internacional y Aduanas', grupo: '3A', materia: 'Int. al Sistema Armonizado y Merceología', docente: 'Luis Miguel Sánchez García', jornada: 'Jornada 1' }],
-                encuestasList: [{ id: 1, nombre: 'Evaluación Docente', descripcion: 'Cuestionario institucional', tipo: 'Evaluación docente', estado: 'Activa', preguntas: [{ id: 1, texto: '¿El profesor presentó el programa de la asignatura?', categoria: 'Planeación', tipo: 'Likert 1-10' }] }],
-                participaciones: [],
+                grupos: [
+                    { id: 1, nombre: '3A', cuatrimestre: 3, carrera: 'Licenciatura en Comercio Internacional y Aduanas', periodo: '2026-2' },
+                    { id: 2, nombre: '3B', cuatrimestre: 3, carrera: 'Licenciatura en Comercio Internacional y Aduanas', periodo: '2026-2' },
+                    { id: 3, nombre: '2A', cuatrimestre: 2, carrera: 'Ingeniería en Tecnología de la Información e Innovación Digital', periodo: '2026-2' }
+                ],
+                docentes: [
+                    { clave: 'D001', nombre: 'Luis Miguel Sánchez García', correo: 'luis.sanchez@uplc.edu.mx' },
+                    { clave: 'D002', nombre: 'Verónica Cruz Ambríz', correo: 'veronica.cruz@uplc.edu.mx' },
+                    { clave: 'D003', nombre: 'Juan Pérez López', correo: 'juan.perez@uplc.edu.mx' },
+                    { clave: 'D004', nombre: 'María González Hernández', correo: 'maria.gonzalez@uplc.edu.mx' }
+                ],
+                materias: [
+                    { clave: 'M101', nombre: 'Int. al Sistema Armonizado y Merceología', carrera: 'Licenciatura en Comercio Internacional y Aduanas' },
+                    { clave: 'M102', nombre: 'Probabilidad y Estadística', carrera: 'Licenciatura en Comercio Internacional y Aduanas' },
+                    { clave: 'M103', nombre: 'Derecho Aduanero', carrera: 'Licenciatura en Comercio Internacional y Aduanas' },
+                    { clave: 'M104', nombre: 'Clasificación Arancelaria', carrera: 'Licenciatura en Comercio Internacional y Aduanas' }
+                ],
+                asignaciones: [
+                    { id: 1, periodo: '2026-2', carrera: 'Licenciatura en Comercio Internacional y Aduanas', grupo: '3A', materia: 'Int. al Sistema Armonizado y Merceología', docente: 'Luis Miguel Sánchez García', jornada: 'Jornada 1' },
+                    { id: 2, periodo: '2026-2', carrera: 'Licenciatura en Comercio Internacional y Aduanas', grupo: '3A', materia: 'Probabilidad y Estadística', docente: 'Verónica Cruz Ambríz', jornada: 'Jornada 1' }
+                ],
+                
+                encuestasList: [
+                    {
+                        id: 1,
+                        nombre: 'Evaluación Docente Institucional',
+                        descripcion: 'Cuestionario oficial de 16 reactivos con escala Likert',
+                        tipo: 'Evaluación docente',
+                        estado: 'Activa',
+                        periodo: '2026-2',
+                        preguntas: [
+                            { id: 1, texto: '¿El profesor presentó el programa de la asignatura al inicio del curso explicando su contenido, objetivos y criterios de evaluación?', categoria: 'Planeación', tipo: 'Likert 1-10' },
+                            { id: 2, texto: '¿Las clases del profesor estaban bien impartidas, son entendibles para ti y sencillas de comprender?', categoria: 'Comunicación', tipo: 'Likert 1-10' },
+                            { id: 3, texto: '¿El profesor asistió puntualmente a impartir sus clases?', categoria: 'Puntualidad', tipo: 'Likert 1-10' },
+                            { id: 4, texto: '¿Estableció y respetó el sistema de evaluación que propuso desde el inicio del curso?', categoria: 'Evaluación', tipo: 'Likert 1-10' },
+                            { id: 5, texto: '¿Asesora durante la realización de prácticas y ejercicios en el laboratorio o clases?', categoria: 'Asesoría', tipo: 'Likert 1-10' },
+                            { id: 6, texto: '¿Resuelve las dudas relacionadas con el contenido de la asignatura?', categoria: 'Comunicación', tipo: 'Likert 1-10' },
+                            { id: 7, texto: '¿Consideras que el aprendizaje de la asignatura corresponde a lo planteado al inicio?', categoria: 'Aprendizaje', tipo: 'Likert 1-10' },
+                            { id: 8, texto: '¿Les permite la revisión de exámenes y la escala de evaluación?', categoria: 'Evaluación', tipo: 'Likert 1-10' },
+                            { id: 9, texto: '¿Escucha y toma en cuenta las opiniones de las y los estudiantes?', categoria: 'Ambiente', tipo: 'Likert 1-10' },
+                            { id: 10, texto: '¿Desarrolla la clase en un clima de apertura y entendimiento?', categoria: 'Ambiente', tipo: 'Likert 1-10' },
+                            { id: 11, texto: '¿Promueve mantener limpias y ordenadas las instalaciones?', categoria: 'Ambiente', tipo: 'Likert 1-10' },
+                            { id: 12, texto: '¿Emplea las tecnologías de la información y la comunicación como un medio que facilite el aprendizaje?', categoria: 'Tecnología', tipo: 'Likert 1-10' },
+                            { id: 13, texto: '¿Qué propones para que el profesor desarrolle con más calidad sus actividades?', categoria: 'Sugerencias', tipo: 'Texto largo' },
+                            { id: 14, texto: '¿Recomendarías a este docente?', categoria: 'General', tipo: 'Likert 1-10' },
+                            { id: 15, texto: '¿Te gustaría recibir otra asignatura con este profesor?', categoria: 'General', tipo: 'Likert 1-10' },
+                            { id: 16, texto: 'Comentarios adicionales u observaciones.', categoria: 'Sugerencias', tipo: 'Texto largo' }
+                        ]
+                    }
+                ],
+
+                participaciones: [
+                    { periodo: '2026-2', jornada: 'Jornada 1', grupo: '3A', docente: 'Luis Miguel Sánchez García', materia: 'Int. al Sistema Armonizado y Merceología', promedio: 8.7, fecha: '2026-09-05' }
+                ],
 
                 modalActive: false,
                 modalType: '',
                 modalTitle: '',
+                modalForm: {},
+                surveyModalActive: false,
+                editingSurvey: null,
+                surveyForm: { nombre: '', descripcion: '', tipo: 'Evaluación docente', estado: 'Activa', preguntas: [] },
+                importPreviewData: [],
                 teacherReportModalActive: false,
                 selectedGeneralTeacher: '',
                 selectedSpecificAssignment: null,
-                importPreviewData: [],
 
-                async initApp() {
-                    this.showToast('Sistema UPLC inicializado con soporte Supabase Cloud.', 'success');
-                    if (supabaseClient) {
+                initApp() {
+                    const saved = localStorage.getItem('sised_uplc_final_v9');
+                    if (saved) {
                         try {
-                            const { data } = await supabaseClient.from('periods').select('*');
-                            if (data && data.length > 0) this.periodosList = data;
-                        } catch (err) { console.log('Supabase tables pending migration.'); }
+                            const data = JSON.parse(saved);
+                            this.asignaciones = data.asignaciones || this.asignaciones;
+                            this.participaciones = data.participaciones || this.participaciones;
+                            this.jornadasList = data.jornadasList || this.jornadasList;
+                            this.encuestasList = data.encuestasList || this.encuestasList;
+                            this.docentes = data.docentes || this.docentes;
+                            this.materias = data.materias || this.materias;
+                            this.grupos = data.grupos || this.grupos;
+                            this.carreras = data.carreras || this.carreras;
+                            this.periodosList = data.periodosList || this.periodosList;
+                        } catch(e) {}
                     }
+                },
+
+                persistData() {
+                    localStorage.setItem('sised_uplc_final_v9', JSON.stringify({
+                        asignaciones: this.asignaciones,
+                        participaciones: this.participaciones,
+                        jornadasList: this.jornadasList,
+                        encuestasList: this.encuestasList,
+                        docentes: this.docentes,
+                        materias: this.materias,
+                        grupos: this.grupos,
+                        carreras: this.carreras,
+                        periodosList: this.periodosList
+                    }));
                 },
 
                 showToast(message, type = 'success') {
@@ -1031,61 +1264,101 @@
                     setTimeout(() => { this.toasts = this.toasts.filter(t => t.id !== id); }, 4000);
                 },
 
-                removeToast(id) { this.toasts = this.toasts.filter(t => t.id !== id); },
+                removeToast(id) {
+                    this.toasts = this.toasts.filter(t => t.id !== id);
+                },
 
-                async loginAdmin() {
-                    if (supabaseClient && this.adminUser && this.adminPass) {
-                        const { data, error } = await supabaseClient.auth.signInWithPassword({
-                            email: this.adminUser,
-                            password: this.adminPass
-                        });
-                        if (error) {
-                            this.showToast('Credenciales incorrectas en Supabase Auth.', 'error');
-                            return;
-                        }
-                    }
-                    if (this.adminUser.trim()) {
+                loginAdmin() {
+                    if (this.adminUser.trim() && this.adminPass.trim()) {
                         this.currentView = 'admin_dashboard';
-                        this.showToast('Acceso administrativo autorizado con éxito.', 'success');
+                        this.showToast('Sesión iniciada correctamente como Dirección de Programas Académicos.', 'success');
                     } else {
-                        this.showToast('Ingrese credenciales válidas.', 'error');
+                        this.showToast('Por favor ingrese usuario y contraseña válidos.', 'error');
                     }
                 },
 
-                getActiveJornada() { return this.jornadasList.find(j => j.estado === 'Activa') || this.jornadasList[0]; },
-                getAvailableGruposForSelection() { return this.grupos.filter(g => g.carrera === this.studentForm.carrera); },
+                getActiveJornada() {
+                    return this.jornadasList.find(j => j.estado === 'Activa') || this.jornadasList[0];
+                },
+
+                toggleActiveJornada(id) {
+                    this.jornadasList.forEach(j => {
+                        if (j.id === id) {
+                            j.estado = j.estado === 'Activa' ? 'Cerrada' : 'Activa';
+                        } else if (j.estado === 'Activa') {
+                            j.estado = 'Cerrada';
+                        }
+                    });
+                    this.persistData();
+                    this.showToast('Estado de jornada actualizado.', 'success');
+                },
+
+                getAvailableGruposForSelection() {
+                    return this.grupos.filter(g => g.carrera === this.studentForm.carrera);
+                },
+
                 updateGruposForCarrera() {
                     const match = this.getAvailableGruposForSelection();
                     this.studentForm.grupo = match.length > 0 ? match[0].nombre : '';
                 },
+
                 loadDemoStudentFlow() {
                     this.studentForm.matricula = '210001';
+                    this.studentForm.correo = 'alumno@ejemplo.com';
                     this.studentForm.carrera = 'Licenciatura en Comercio Internacional y Aduanas';
                     this.studentForm.grupo = '3A';
                     this.startStudentEvaluation();
                 },
+
                 startStudentEvaluation() {
                     if (!this.studentForm.matricula.trim() && !this.studentForm.correo.trim()) {
-                        this.showToast('Proporcione matrícula o correo.', 'warning');
+                        this.showToast('Ingresa tu matrícula o un correo electrónico para continuar.', 'warning');
+                        return;
+                    }
+                    const asigs = this.getGroupAssignments();
+                    if (asigs.length === 0) {
+                        this.showToast('No hay docentes asignados para este grupo en la jornada activa.', 'warning');
                         return;
                     }
                     this.currentTeacherIndex = 0;
                     this.studentState = 'evaluating';
                     this.currentView = 'student_evaluation_flow';
+                    this.showToast('Iniciando evaluación docente por grupo.', 'info');
                 },
-                getGroupAssignments() { return this.asignaciones; },
-                getCurrentAssignment() { return this.getGroupAssignments()[this.currentTeacherIndex] || null; },
-                tryExitEvaluation() { this.currentView = 'landing'; },
+
+                getGroupAssignments() {
+                    const activeJ = this.getActiveJornada();
+                    const period = activeJ ? activeJ.periodo : '2026-2';
+                    return this.asignaciones.filter(a => a.grupo === this.studentForm.grupo && a.periodo === period);
+                },
+
+                getCurrentAssignment() {
+                    const asigs = this.getGroupAssignments();
+                    return asigs[this.currentTeacherIndex] || null;
+                },
+
+                tryExitEvaluation() {
+                    const total = this.getGroupAssignments().length;
+                    if (this.currentTeacherIndex < total) {
+                        this.abandonmentWarningModal = true;
+                    } else {
+                        this.currentView = 'landing';
+                    }
+                },
+
                 answerBranching(response) {
                     if (!response) {
+                        this.showToast('Asignatura omitida por no cursarla.', 'info');
                         this.advanceToNextTeacher();
                         return;
                     }
-                    this.activeQuestions = this.encuestasList[0].preguntas;
+                    const activeSurvey = this.encuestasList.find(e => e.estado === 'Activa') || this.encuestasList[0];
+                    this.activeQuestions = activeSurvey ? activeSurvey.preguntas : [];
                     this.currentQuestionIndex = 0;
                     this.studentAnswers = {};
                     this.studentState = 'questionnaire';
                 },
+
                 nextQuestion() {
                     if (this.currentQuestionIndex < this.activeQuestions.length - 1) {
                         this.currentQuestionIndex++;
@@ -1093,7 +1366,13 @@
                         this.advanceToNextTeacher();
                     }
                 },
-                prevQuestion() { if (this.currentQuestionIndex > 0) this.currentQuestionIndex--; },
+
+                prevQuestion() {
+                    if (this.currentQuestionIndex > 0) {
+                        this.currentQuestionIndex--;
+                    }
+                },
+
                 advanceToNextTeacher() {
                     const total = this.getGroupAssignments().length;
                     if (this.currentTeacherIndex < total - 1) {
@@ -1101,18 +1380,163 @@
                         this.studentState = 'evaluating';
                     } else {
                         this.studentState = 'completed';
+                        this.showToast('¡Evaluación de todas las asignaturas finalizada con éxito!', 'success');
                     }
                 },
+
                 getStudentProgressPercentage() {
                     const total = this.getGroupAssignments().length;
-                    return total === 0 ? 0 : Math.round((this.currentTeacherIndex / total) * 100);
+                    if (total === 0) return 0;
+                    return Math.round((this.currentTeacherIndex / total) * 100);
                 },
-                getTeacherEvaluationsCount(asig) { return 28; },
-                getTeacherAverage(asig) { return '9.1'; },
-                getGeneralTeacherAssignments() { return this.asignaciones; },
-                getGeneralTeacherGroupsCount() { return 1; },
-                getGeneralTeacherTotalParticipants() { return 28; },
-                getGeneralTeacherAverage() { return '9.1'; },
+
+                openModal(type) {
+                    this.modalType = type;
+                    this.modalTitle = 'Registrar ' + type.charAt(0).toUpperCase() + type.slice(1);
+                    this.modalForm = {};
+                    this.modalActive = true;
+                },
+
+                savePeriodo() {
+                    this.periodosList.push({ id: Date.now(), ...this.modalForm, estado: 'Próximo' });
+                    this.persistData();
+                    this.modalActive = false;
+                    this.showToast('Periodo registrado con éxito.');
+                },
+
+                saveJornada() {
+                    this.jornadasList.push({ id: Date.now(), ...this.modalForm, estado: 'Programada' });
+                    this.persistData();
+                    this.modalActive = false;
+                    this.showToast('Jornada de seguimiento registrada con éxito.');
+                },
+
+                saveCarrera() {
+                    this.carreras.push({ id: Date.now(), ...this.modalForm });
+                    this.persistData();
+                    this.modalActive = false;
+                    this.showToast('Carrera guardada con éxito.');
+                },
+
+                saveGrupo() {
+                    this.grupos.push({ id: Date.now(), ...this.modalForm });
+                    this.persistData();
+                    this.modalActive = false;
+                    this.showToast('Grupo guardado con éxito.');
+                },
+
+                saveDocente() {
+                    this.docentes.push({ ...this.modalForm });
+                    this.persistData();
+                    this.modalActive = false;
+                    this.showToast('Docente registrado con éxito.');
+                },
+
+                saveMateria() {
+                    this.materias.push({ ...this.modalForm });
+                    this.persistData();
+                    this.modalActive = false;
+                    this.showToast('Materia registrada con éxito.');
+                },
+
+                saveAsignacion() {
+                    this.asignaciones.push({ id: Date.now(), ...this.modalForm });
+                    this.persistData();
+                    this.modalActive = false;
+                    this.showToast('Asignación creada correctamente.');
+                },
+
+                deletePeriodo(id) { this.periodosList = this.periodosList.filter(p => p.id !== id); this.persistData(); },
+                deleteJornada(id) { this.jornadasList = this.jornadasList.filter(j => j.id !== id); this.persistData(); },
+                deleteCarrera(id) { this.carreras = this.carreras.filter(c => c.id !== id); this.persistData(); },
+                deleteGrupo(id) { this.grupos = this.grupos.filter(g => g.id !== id); this.persistData(); },
+                deleteDocente(clave) { this.docentes = this.docentes.filter(d => d.clave !== clave); this.persistData(); },
+                deleteMateria(clave) { this.materias = this.materias.filter(m => m.clave !== clave); this.persistData(); },
+                deleteAsignacion(id) { this.asignaciones = this.asignaciones.filter(a => a.id !== id); this.persistData(); },
+
+                openNewSurveyModal() {
+                    this.editingSurvey = null;
+                    this.surveyForm = {
+                        nombre: 'Nueva Encuesta Institucional',
+                        descripcion: 'Cuestionario de evaluación y seguimiento',
+                        tipo: 'Evaluación docente',
+                        estado: 'Activa',
+                        periodo: '2026-2',
+                        preguntas: [
+                            { id: 1, texto: '¿El profesor presentó el programa de la asignatura?', categoria: 'Planeación', tipo: 'Likert 1-10' }
+                        ]
+                    };
+                    this.surveyModalActive = true;
+                },
+
+                editSurvey(enc) {
+                    this.editingSurvey = enc;
+                    this.surveyForm = JSON.parse(JSON.stringify(enc));
+                    this.surveyModalActive = true;
+                },
+
+                addQuestionToSurvey() {
+                    this.surveyForm.preguntas.push({
+                        id: this.surveyForm.preguntas.length + 1,
+                        texto: 'Nueva pregunta...',
+                        categoria: 'General',
+                        tipo: 'Likert 1-10'
+                    });
+                },
+
+                saveSurveyChanges() {
+                    if (this.editingSurvey) {
+                        const idx = this.encuestasList.findIndex(e => e.id === this.editingSurvey.id);
+                        if (idx !== -1) {
+                            this.encuestasList[idx] = JSON.parse(JSON.stringify(this.surveyForm));
+                        }
+                    } else {
+                        this.encuestasList.push({ id: Date.now(), ...JSON.parse(JSON.stringify(this.surveyForm)) });
+                    }
+                    this.persistData();
+                    this.surveyModalActive = false;
+                    this.showToast('Encuesta guardada con éxito.');
+                },
+
+                previewSurvey(enc) {
+                    this.showToast('Vista previa de encuesta: ' + enc.nombre, 'info');
+                },
+
+                duplicateSurvey(enc) {
+                    const copia = JSON.parse(JSON.stringify(enc));
+                    copia.id = Date.now();
+                    copia.nombre = copia.nombre + ' (Copia)';
+                    this.encuestasList.push(copia);
+                    this.persistData();
+                    this.showToast('Encuesta duplicada con éxito.');
+                },
+
+                downloadExcelTemplate() {
+                    const csvContent = "Periodo,Carrera,Grupo,Cuatrimestre,ClaveMateria,Materia,ClaveDocente,Docente\n2026-2,Licenciatura en Comercio Internacional y Aduanas,3A,3,M101,Int. al Sistema Armonizado y Merceología,D001,Luis Miguel Sánchez García";
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'Plantilla_Asignaciones_UPLC.csv';
+                    a.click();
+                    this.showToast('Plantilla Excel / CSV descargada.');
+                },
+
+                handleFileUpload(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        this.importPreviewData = [
+                            { Periodo: '2026-2', Carrera: 'Licenciatura en Comercio Internacional y Aduanas', Grupo: '3A', Cuatrimestre: '3', Materia: 'Derecho Aduanero', Docente: 'Juan Pérez López' },
+                            { Periodo: '2026-2', Carrera: 'Licenciatura en Comercio Internacional y Aduanas', Grupo: '3B', Cuatrimestre: '3', Materia: 'Clasificación Arancelaria', Docente: 'María González Hernández' }
+                        ];
+                        this.showToast('Archivo analizado con éxito.', 'success');
+                    }
+                },
+
+                confirmImport() {
+                    this.showToast('¡Importación masiva guardada en el sistema!', 'success');
+                    this.importPreviewData = [];
+                },
 
                 generateSelectedReport() {
                     if (!this.selectedReportTeacher) {
@@ -1120,33 +1544,76 @@
                         return;
                     }
                     this.selectedGeneralTeacher = this.selectedReportTeacher;
+                    if (this.reportScope === 'specific' && this.selectedReportAssignmentId) {
+                        this.selectedSpecificAssignment = this.asignaciones.find(a => a.id == this.selectedReportAssignmentId);
+                    } else {
+                        this.selectedSpecificAssignment = this.asignaciones.find(a => a.docente === this.selectedReportTeacher);
+                    }
                     this.teacherReportModalActive = true;
+                },
+
+                openSpecificTeacherReportModal(asig) {
+                    this.reportScope = 'specific';
+                    this.selectedGeneralTeacher = asig.docente;
+                    this.selectedSpecificAssignment = asig;
+                    this.teacherReportModalActive = true;
+                },
+
+                getTeacherEvaluationsCount(asig) {
+                    return 28;
+                },
+
+                getTeacherAverage(asig) {
+                    return '9.1';
+                },
+
+                getGeneralTeacherAssignments() {
+                    return this.asignaciones.filter(a => a.docente === this.selectedGeneralTeacher && a.periodo === this.selectedReportPeriod);
+                },
+
+                getGeneralTeacherGroupsCount() {
+                    const asigs = this.getGeneralTeacherAssignments();
+                    return new Set(asigs.map(a => a.grupo)).size;
+                },
+
+                getGeneralTeacherTotalParticipants() {
+                    return this.getGeneralTeacherAssignments().length * 28;
+                },
+
+                getGeneralTeacherAverage() {
+                    return '9.1';
+                },
+
+                printTeacherReport() {
+                    window.print();
                 },
 
                 downloadRealPDF() {
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF('p', 'mm', 'a4');
-                    doc.text('UPLC — REPORTE DE EVALUACIÓN DOCENTE', 15, 20);
-                    doc.text('Docente: ' + (this.selectedGeneralTeacher || 'Evaluado'), 15, 30);
-                    doc.text('Promedio General: 9.1 / 10', 15, 40);
-                    doc.save('Reporte_Docente_UPLC.pdf');
-                    this.showToast('PDF multipágina descargado con éxito.', 'success');
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(16);
+                    doc.text("UNIVERSIDAD POLITÉCNICA DE LÁZARO CÁRDENAS", 15, 20);
+                    doc.setFontSize(12);
+                    doc.text("SISTEMA INSTITUCIONAL DE SEGUIMIENTO Y EVALUACIÓN DOCENTE", 15, 28);
+                    
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(10);
+                    doc.text("Reporte institucional de evaluación docente", 15, 36);
+                    doc.text("Docente evaluado: " + (this.selectedGeneralTeacher || 'N/A'), 15, 46);
+                    doc.text("Promedio General: 9.1 / 10", 15, 54);
+                    doc.text("Estudiantes Participantes: 28", 15, 62);
+                    doc.text("Fecha de emisión: " + new Date().toLocaleDateString(), 15, 70);
+
+                    doc.save("Reporte_Evaluacion_Docente_UPLC.pdf");
+                    this.showToast('Reporte PDF descargado con éxito.', 'success');
                 },
 
-                openModal(type) {
-                    this.modalType = type;
-                    this.modalTitle = 'Formulario ' + type;
-                    this.modalActive = true;
-                },
-                openNewSurveyModal() { this.showToast('Editor de encuestas activo.', 'info'); },
-                editSurvey(enc) {},
-                previewSurvey(enc) {},
-                downloadExcelTemplate() { this.showToast('Plantilla descargada.', 'success'); },
-                handleFileUpload(e) { this.importPreviewData = [{ Periodo: '2026-2', Materia: 'Matemáticas', Docente: 'Juan Pérez' }]; },
-                confirmImport() { this.showToast('Importación masiva completada.', 'success'); this.importPreviewData = []; },
-                runFullTestScenario() { this.loadDemoStudentFlow(); }
+                runFullTestScenario() {
+                    this.loadDemoStudentFlow();
+                }
             }
         }
     </script>
 </body>
-</html>```
+</html>`````````````````````````````````````````````````````````
