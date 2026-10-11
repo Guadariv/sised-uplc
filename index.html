@@ -2831,7 +2831,7 @@ const { data: existente, error: buscarError } = await db
     .select('id')
     .eq('session_id', activeJ.id)
     .eq('group_id', grupo.id)
-    .eq('student_identifier', identificador)
+    .eq('student_user_id', user.id)
     .maybeSingle();
 
 if (buscarError) throw buscarError;
@@ -2863,7 +2863,7 @@ if (!participacion) {
                 .select('id')
                 .eq('session_id', activeJ.id)
                 .eq('group_id', grupo.id)
-                .eq('student_identifier', identificador)
+                .eq('student_user_id', user.id)
                 .maybeSingle();
 
             if (recuperarError) throw recuperarError;
