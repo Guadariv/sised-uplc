@@ -158,15 +158,27 @@
                             </select>
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold text-teal-300 uppercase tracking-wider mb-1.5">Grupo *</label>
-                            <select x-model="studentForm.grupo" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-teal-500 text-sm">
-                                <option value="">Seleccione grupo...</option>
-                                <template x-for="g in getAvailableGruposForSelection()" :key="g.id">
-                                    <option :value="g.nombre" x-text="'Grupo ' + g.nombre + (g.cuatrimestre ? ' (' + g.cuatrimestre + '° Cuatrimestre)' : '')"></option>
-                                </template>
-                            </select>
-                        </div>
+                       
+<div>
+    <label class="block text-xs font-semibold text-teal-300 uppercase tracking-wider mb-1.5">
+        Grupo *
+    </label>
+
+    <select
+        x-model="studentForm.grupo"
+        required
+        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-teal-500 text-sm"
+    >
+        <option value="">Seleccione grupo...</option>
+
+        <template x-for="g in getAvailableGruposForSelection()" :key="g.id">
+            <option
+                :value="g.id"
+                x-text="'Grupo ' + g.nombre + (g.cuatrimestre ? ' (' + g.cuatrimestre + '° Cuatrimestre)' : '')"
+            ></option>
+        </template>
+    </select>
+</div>
 
                         <button type="submit" class="w-full py-4 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-base mt-2 cursor-pointer">
                             <span>INICIAR EVALUACIÓN</span>
@@ -249,7 +261,11 @@
                     </div>
                     <div class="flex items-center space-x-3">
                         <div class="text-right hidden sm:block">
-                            <span class="text-xs font-bold text-slate-700 block" x-text="'Grupo: ' + studentForm.grupo"></span>
+                           
+<span class="text-xs font-bold text-slate-700 block"
+      x-text="'Grupo: ' + (this.grupos.find(g => g.id === studentForm.grupo)?.nombre || '')">
+</span>
+
                             <span class="text-[10px] text-slate-400" x-text="studentForm.carrera"></span>
                         </div>
                         <button @click="tryExitEvaluation()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition cursor-pointer">
@@ -2763,10 +2779,19 @@ getDashboardJornada() {
     );
 },
 
-                updateGruposForCarrera() {
-                    const match = this.getAvailableGruposForSelection();
-                    this.studentForm.grupo = match.length > 0 ? match[0].nombre : '';
-                },
+              
+getGroupAssignments() {
+    const activeJ = this.getActiveJornada();
+
+    if (!activeJ || !this.studentForm.grupo) {
+        return [];
+    }
+
+    return this.asignaciones.filter(a =>
+        a.grupoId === this.studentForm.grupo &&
+        a.jornadaId === activeJ.id
+    );
+},
 
                 loadDemoStudentFlow() {
                     this.studentForm.matricula = '210001';
@@ -2815,10 +2840,12 @@ if (!activeJ || !activeJ.id) {
     return;
 }
 
-// Obtener el grupo seleccionado
+
+// Obtener el grupo seleccionado por su ID único
 const grupo = this.grupos.find(g =>
-    g.nombre === this.studentForm.grupo
+    g.id === this.studentForm.grupo
 );
+
 
 if (!grupo || !grupo.id) {
     this.showToast('No se encontró el grupo seleccionado.', 'error');
@@ -2953,35 +2980,33 @@ if (indicePendiente === -1) {
 }
                 },
 
-               getGroupAssignments() {
+              
+getGroupAssignments() {
     const activeJ = this.getActiveJornada();
 
     if (!activeJ) {
         return [];
     }
 
-    return this.asignaciones.filter(a => {
+    // Identificar el grupo exacto del estudiante
+    const grupoSeleccionado = this.grupos.find(g =>
+        g.carrera === this.studentForm.carrera &&
+        g.nombre === this.studentForm.grupo &&
+        g.activo === true &&
+        g.periodo === activeJ.periodo
+    );
 
-        const mismoGrupo =
-            a.grupo === this.studentForm.grupo;
+    if (!grupoSeleccionado) {
+        return [];
+    }
 
-        const mismaCarrera =
-            a.carrera === this.studentForm.carrera;
-
-        const mismoPeriodo =
-            a.periodo === activeJ.periodo;
-
-        const mismaJornada =
-            a.jornadaId === activeJ.id;
-
-        return (
-            mismoGrupo &&
-            mismaCarrera &&
-            mismoPeriodo &&
-            mismaJornada
-        );
-    });
+    // Mostrar únicamente las materias de ese grupo
+    return this.asignaciones.filter(a =>
+        a.grupoId === grupoSeleccionado.id &&
+        a.jornadaId === activeJ.id
+    );
 },
+
                 getCurrentAssignment() {
                     const asigs = this.getGroupAssignments();
                     return asigs[this.currentTeacherIndex] || null;
