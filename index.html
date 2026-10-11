@@ -2776,7 +2776,15 @@ getDashboardJornada() {
     return this.grupos.filter(g =>
         g.carrera === this.studentForm.carrera &&
         g.activo === true
-    );
+    )
+},
+
+updateGruposForCarrera() {
+    const gruposDisponibles = this.getAvailableGruposForSelection();
+
+    this.studentForm.grupo = gruposDisponibles.length > 0
+        ? gruposDisponibles[0].id
+        : '';
 },
 
               
