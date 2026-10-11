@@ -146,21 +146,7 @@
 
                     <!-- Student Identification Form (Matrícula O Correo - Al menos uno) -->
                     <form @submit.prevent="startStudentEvaluation()" class="space-y-4 text-left bg-white/5 p-6 rounded-2xl border border-white/10">
-                        <div class="bg-teal-950/40 p-4 rounded-xl border border-teal-500/30 text-xs text-teal-200 mb-2">
-                            <i class="fas fa-info-circle mr-1"></i> Para continuar, proporciona <strong>al menos uno</strong> de los siguientes datos (Matrícula o Correo):
-                        </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold text-teal-300 uppercase tracking-wider mb-1.5">Matrícula</label>
-                            <input type="text" x-model="studentForm.matricula" placeholder="Ej. 210001" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-teal-500 text-sm">
-                        </div>
-
-                        <div class="text-center text-xs text-teal-300 font-bold my-1">— Ó —</div>
-
-                        <div>
-                            <label class="block text-xs font-semibold text-teal-300 uppercase tracking-wider mb-1.5">Correo Electrónico (Cualquiera válido)</label>
-                            <input type="text" x-model="studentForm.correo" placeholder="correo@ejemplo.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-teal-500 text-sm">
-                        </div>
 
                         <div>
                             <label class="block text-xs font-semibold text-teal-300 uppercase tracking-wider mb-1.5">Carrera *</label>
@@ -172,27 +158,53 @@
                             </select>
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold text-teal-300 uppercase tracking-wider mb-1.5">Grupo *</label>
-                            <select x-model="studentForm.grupo" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-teal-500 text-sm">
-                                <option value="">Seleccione grupo...</option>
-                                <template x-for="g in getAvailableGruposForSelection()" :key="g.id">
-                                    <option :value="g.nombre" x-text="'Grupo ' + g.nombre + (g.cuatrimestre ? ' (' + g.cuatrimestre + '° Cuatrimestre)' : '')"></option>
-                                </template>
-                            </select>
-                        </div>
+                       
+<div>
+    <label class="block text-xs font-semibold text-teal-300 uppercase tracking-wider mb-1.5">
+        Grupo *
+    </label>
+
+    <select
+        x-model="studentForm.grupo"
+        required
+        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-teal-500 text-sm"
+    >
+        <option value="">Seleccione grupo...</option>
+
+        <template x-for="g in getAvailableGruposForSelection()" :key="g.id">
+            <option
+                :value="g.id"
+                x-text="'Grupo ' + g.nombre + (g.cuatrimestre ? ' (' + g.cuatrimestre + '° Cuatrimestre)' : '')"
+            ></option>
+        </template>
+    </select>
+</div>
 
                         <button type="submit" class="w-full py-4 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-base mt-2 cursor-pointer">
                             <span>INICIAR EVALUACIÓN</span>
                             <i class="fas fa-arrow-right"></i>
                         </button>
                     </form>
+<div class="mt-5">
+    <button
+        type="button"
+        @click="loginStudentWithGoogle()"
+        class="w-full bg-white text-slate-800 font-bold
+               py-4 px-6 rounded-xl shadow-lg
+               hover:bg-slate-100 transition
+               flex items-center justify-center gap-3">
 
-                    <div class="mt-4 text-center">
-                        <button @click="loadDemoStudentFlow()" class="text-teal-300 hover:text-white underline text-xs font-medium cursor-pointer">
-                            <i class="fas fa-bolt mr-1"></i> Cargar datos de prueba (Grupo 3A)
-                        </button>
-                    </div>
+        <i class="fab fa-google text-lg"></i>
+
+        <span>Continuar con Google</span>
+    </button>
+
+    <p class="text-center text-slate-400 text-xs mt-3">
+        Inicia sesión con tu cuenta de Google
+        para verificar tu identidad.
+    </p>
+</div>
+                   
                 </div>
 
                 <footer class="text-center py-4 no-print">
@@ -1193,7 +1205,7 @@
         ? getGeneralTeacherQuestionResults()
         : getTeacherQuestionResults(selectedSpecificAssignment)).length === 0"
     class="text-slate-500 italic py-3">
-    
+
         No hay respuestas disponibles para esta evaluación.
     </div>
 
@@ -2070,7 +2082,33 @@ previewSurveyData: null,
 
                 async initApp() {
     console.log('Iniciando SISED con Supabase...');
+// ====================================
+// IDENTIFICAR SESIÓN DE GOOGLE
+// ====================================
+try {
+    const { data: { user }, error } = await db.auth.getUser();
 
+    if (error) {
+        console.warn('No se pudo recuperar la sesión:', error);
+    }
+
+    if (user) {
+        const { data: esAdministrador, error: errorRol } =
+            await db.rpc('is_sised_admin');
+
+        if (errorRol) {
+            console.warn('No se pudo verificar el rol:', errorRol);
+        }
+
+        if (!errorRol && esAdministrador === true) {
+            console.log('Sesión administrativa detectada.');
+        } else if (!errorRol) {
+            console.log('Sesión estudiantil de Google detectada.');
+        }
+    }
+} catch (error) {
+    console.error('Error verificando la sesión:', error);
+}
     // ================================
     // 1. CARRERAS
     // ================================
@@ -2342,32 +2380,35 @@ try {
 // 6. GRUPOS
 // ================================
 try {
-   const { data, error } = await db
-    .from('groups')
-    .select(`
-        id,
-        career_id,
-        period_id,
-        name,
-        term_number,
-        expected_students,
-        careers(id,name),
-        periods(id,name)
-    `)
+    const { data, error } = await db
+        .from('groups')
+        .select(`
+            id,
+            career_id,
+            period_id,
+            name,
+            term_number,
+            expected_students,
+            is_active,
+            careers(id,name),
+            periods(id,name)
+        `)
         .order('term_number');
 
     if (error) throw error;
 
     this.grupos = data.map(g => ({
-    id: g.id,
-    nombre: g.name,
-    cuatrimestre: g.term_number,
-    carrera: g.careers ? g.careers.name : '',
-    carreraId: g.career_id,
-    periodo: g.periods ? g.periods.name : '',
-    periodoId: g.period_id,
-    alumnosEsperados: g.expected_students || 0
-}));
+        id: g.id,
+        nombre: g.name,
+        cuatrimestre: g.term_number,
+        carrera: g.careers ? g.careers.name : '',
+        carreraId: g.career_id,
+        periodo: g.periods ? g.periods.name : '',
+        periodoId: g.period_id,
+        alumnosEsperados: g.expected_students || 0,
+        activo: g.is_active
+    }));
+
     console.log('Grupos cargados:', this.grupos.length);
 
 } catch (error) {
@@ -2437,105 +2478,18 @@ try {
 // ====================================
 // 8. PARTICIPACIONES
 // ====================================
-try {
-    const { data, error } = await db
-        .from('participations')
-        .select(`
-            id,
-            session_id,
-            group_id,
-            student_identifier,
-            career_name,
-            completed_at,
-            monitoring_sessions (
-                id,
-                name,
-                period_id,
-                periods (
-                    id,
-                    name
-                )
-            ),
-            groups (
-                id,
-                name,
-                career_id,
-                careers (
-                    id,
-                    name
-                )
-            )
-        `)
-        .order('completed_at', { ascending: false });
+// No cargar datos personales de estudiantes
+// durante el acceso público al sistema.
 
-    if (error) throw error;
-
-    this.participaciones = data.map(p => ({
-        id: p.id,
-        sessionId: p.session_id,
-        grupoId: p.group_id,
-        student_identifier: p.student_identifier,
-        carrera: p.career_name || p.groups?.careers?.name || '',
-        grupo: p.groups?.name || '',
-        jornada: p.monitoring_sessions?.name || '',
-        periodo: p.monitoring_sessions?.periods?.name || '',
-        fecha: p.completed_at
-    }));
-
-    console.log(
-        'Participaciones cargadas:',
-        this.participaciones.length
-    );
-
-} catch (error) {
-    console.error('Error cargando participaciones:', error);
-    this.showToast('Error al cargar participaciones.', 'error');
-}
+this.participaciones = [];
 // =====================================
 // 7.5 EVALUACIONES REALIZADAS
 // =====================================
-try {
+// Las evaluaciones son información restringida.
+// No se consultan durante la carga pública del sistema.
+// Se cargarán después de verificar el acceso administrativo.
 
-    const { data: evaluacionesDB, error: evaluacionesError } = await db
-        .from('evaluation_responses')
-        .select(`
-            id,
-            participation_id,
-            teacher_id,
-            subject_id,
-            is_taking_course,
-            answers_json,
-            created_at
-        `)
-        .order('created_at', { ascending: true });
-
-    if (evaluacionesError) throw evaluacionesError;
-
-    this.evaluaciones = (evaluacionesDB || []).map(e => ({
-        id: e.id,
-        participationId: e.participation_id,
-        docenteId: e.teacher_id,
-        materiaId: e.subject_id,
-        cursaMateria: e.is_taking_course,
-        respuestas: e.answers_json || {},
-        fecha: e.created_at
-    }));
-
-    console.log(
-        'Evaluaciones cargadas:',
-        this.evaluaciones.length
-    );
-
-} catch (error) {
-
-    console.error(
-        'Error cargando evaluaciones:',
-        error
-    );
-
-    this.evaluaciones = [];
-
-}
+this.evaluaciones = [];
 // ==========================================
 // 8. ENCUESTAS Y PREGUNTAS
 // ==========================================
@@ -2629,7 +2583,51 @@ console.log(
 }
     console.log('Carga inicial de Supabase terminada.');
 },
+async cargarEvaluacionesAdmin() {
+    const { data: usuario } = await db.auth.getUser();
 
+    if (!usuario?.user) {
+        this.evaluaciones = [];
+        return;
+    }
+
+    const { data: esAdministrador, error: errorPermisos } =
+        await db.rpc('is_sised_admin');
+
+    if (errorPermisos) throw errorPermisos;
+
+    if (esAdministrador !== true) {
+        this.evaluaciones = [];
+        return;
+    }
+
+    const { data, error } = await db
+        .from('evaluation_responses')
+        .select(`
+            id,
+            participation_id,
+            teacher_id,
+            subject_id,
+            is_taking_course,
+            answers_json,
+            created_at
+        `)
+        .order('created_at', { ascending: true });
+
+    if (error) throw error;
+
+    this.evaluaciones = (data || []).map(e => ({
+        id: e.id,
+        participationId: e.participation_id,
+        docenteId: e.teacher_id,
+        materiaId: e.subject_id,
+        cursaMateria: e.is_taking_course,
+        respuestas: e.answers_json || {},
+        fecha: e.created_at
+    }));
+
+    console.log('Evaluaciones administrativas cargadas:', this.evaluaciones.length);
+},
                 persistData() {
                     localStorage.setItem('sised_uplc_final_v8', JSON.stringify({
                         asignaciones: this.asignaciones,
@@ -2653,15 +2651,91 @@ console.log(
                 removeToast(id) {
                     this.toasts = this.toasts.filter(t => t.id !== id);
                 },
+async loginStudentWithGoogle() {
+    try {
+        const { data, error } = await db.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: 'https://sised-uplc.vercel.app'
+            }
+        });
 
-                loginAdmin() {
-                    if (this.adminUser.trim() && this.adminPass.trim()) {
-                        this.currentView = 'admin_dashboard';
-                        this.showToast('Sesión iniciada correctamente como Dirección de Programas Académicos.', 'success');
-                    } else {
-                        this.showToast('Por favor ingrese usuario y contraseña válidos.', 'error');
-                    }
-                },
+        if (error) throw error;
+
+    } catch (error) {
+        console.error('Error al iniciar sesión con Google:', error);
+
+        this.showToast(
+            'No fue posible iniciar sesión con Google. Inténtalo nuevamente.',
+            'error'
+        );
+    }
+},
+              async loginAdmin() {
+    const correo = this.adminUser.trim();
+    const contrasena = this.adminPass;
+
+    if (!correo || !contrasena) {
+        this.showToast(
+            'Ingrese su correo electrónico y contraseña.',
+            'warning'
+        );
+        return;
+    }
+
+    try {
+        const { data, error } = await db.auth.signInWithPassword({
+            email: correo,
+            password: contrasena
+        });
+
+        if (error) throw error;
+
+        if (!data.user) {
+            throw new Error('No se pudo verificar la cuenta.');
+        }
+
+        // Verificar autorización administrativa en Supabase
+        const { data: esAdministrador, error: errorPermisos } =
+            await db.rpc('is_sised_admin');
+
+        if (errorPermisos) throw errorPermisos;
+
+        if (esAdministrador !== true) {
+            await db.auth.signOut();
+
+            this.showToast(
+                'Esta cuenta no tiene autorización administrativa.',
+                'error'
+            );
+            return;
+        }
+
+        // Acceso autorizado
+// Cargar las evaluaciones después de verificar
+// que el usuario tiene permisos administrativos.
+
+await this.cargarEvaluacionesAdmin();
+
+this.adminPass = '';
+this.currentView = 'admin_dashboard';
+
+this.showToast(
+    'Bienvenido al panel administrativo de SISED-UPLC.',
+    'success'
+);
+
+    } catch (error) {
+        console.error('Error de acceso administrativo:', error);
+
+        await db.auth.signOut();
+
+        this.showToast(
+            'No fue posible iniciar sesión. Verifique sus credenciales o permisos.',
+            'error'
+        );
+    }
+},
 
                 getActiveJornada() {
                     return this.jornadasList.find(j => j.estado === 'Activa') || this.jornadasList[0];
@@ -2695,13 +2769,25 @@ getDashboardJornada() {
                 },
 
                 getAvailableGruposForSelection() {
-                    return this.grupos.filter(g => g.carrera === this.studentForm.carrera);
-                },
+    return this.grupos.filter(g =>
+        g.carrera === this.studentForm.carrera &&
+        g.activo === true
+    );
+},
 
-                updateGruposForCarrera() {
-                    const match = this.getAvailableGruposForSelection();
-                    this.studentForm.grupo = match.length > 0 ? match[0].nombre : '';
-                },
+              
+getGroupAssignments() {
+    const activeJ = this.getActiveJornada();
+
+    if (!activeJ || !this.studentForm.grupo) {
+        return [];
+    }
+
+    return this.asignaciones.filter(a =>
+        a.grupoId === this.studentForm.grupo &&
+        a.jornadaId === activeJ.id
+    );
+},
 
                 loadDemoStudentFlow() {
                     this.studentForm.matricula = '210001';
@@ -2712,10 +2798,31 @@ getDashboardJornada() {
                 },
 
                async startStudentEvaluation() {
-                    if (!this.studentForm.matricula.trim() && !this.studentForm.correo.trim()) {
-                        this.showToast('Ingresa tu matrícula o un correo electrónico para continuar.', 'warning');
-                        return;
-                    }
+                // Verificar que el estudiante inició sesión con Google
+const { data: { user }, error: authError } = await db.auth.getUser();
+
+if (authError || !user) {
+    this.showToast(
+        'Debes iniciar sesión con tu cuenta de Google para realizar la evaluación.',
+        'warning'
+    );
+    return;
+}
+
+// Comprobar que la sesión corresponde a Google
+const accesoGoogle = (user.app_metadata?.providers || [])
+    .includes('google');
+
+if (!accesoGoogle) {
+    this.showToast(
+        'Para evaluar debes ingresar con tu cuenta de Google.',
+        'warning'
+    );
+    return;
+}
+// Utilizar el correo de la cuenta autenticada con Google
+this.studentForm.correo = user.email || '';
+                    
                     const asigs = this.getGroupAssignments();
                     if (asigs.length === 0) {
                         this.showToast('No hay docentes asignados para este grupo en la jornada activa.', 'warning');
@@ -2739,11 +2846,8 @@ if (!grupo || !grupo.id) {
     return;
 }
 
-// Identificador del estudiante: matrícula o correo
-const identificador = (
-    this.studentForm.matricula ||
-    this.studentForm.correo
-).trim();
+// Identificador único basado en el correo autenticado de Google
+const identificador = user.email.trim().toLowerCase();
 
 try {
 
@@ -2754,7 +2858,7 @@ const { data: existente, error: buscarError } = await db
     .select('id')
     .eq('session_id', activeJ.id)
     .eq('group_id', grupo.id)
-    .eq('student_identifier', identificador)
+    .eq('student_user_id', user.id)
     .maybeSingle();
 
 if (buscarError) throw buscarError;
@@ -2766,12 +2870,13 @@ if (!participacion) {
     // Intentar crear la participación únicamente si no existe
     const { data: nueva, error: crearError } = await db
         .from('participations')
-        .insert({
-            session_id: activeJ.id,
-            group_id: grupo.id,
-            student_identifier: identificador,
-            career_name: this.studentForm.carrera
-        })
+       .insert({
+    session_id: activeJ.id,
+    group_id: grupo.id,
+    student_identifier: identificador,
+    career_name: this.studentForm.carrera,
+    student_user_id: user.id
+})
         .select('id')
         .single();
 
@@ -2785,7 +2890,7 @@ if (!participacion) {
                 .select('id')
                 .eq('session_id', activeJ.id)
                 .eq('group_id', grupo.id)
-                .eq('student_identifier', identificador)
+                .eq('student_user_id', user.id)
                 .maybeSingle();
 
             if (recuperarError) throw recuperarError;
@@ -2869,35 +2974,33 @@ if (indicePendiente === -1) {
 }
                 },
 
-               getGroupAssignments() {
+              
+getGroupAssignments() {
     const activeJ = this.getActiveJornada();
 
     if (!activeJ) {
         return [];
     }
 
-    return this.asignaciones.filter(a => {
+    // Identificar el grupo exacto del estudiante
+    const grupoSeleccionado = this.grupos.find(g =>
+        g.carrera === this.studentForm.carrera &&
+        g.nombre === this.studentForm.grupo &&
+        g.activo === true &&
+        g.periodo === activeJ.periodo
+    );
 
-        const mismoGrupo =
-            a.grupo === this.studentForm.grupo;
+    if (!grupoSeleccionado) {
+        return [];
+    }
 
-        const mismaCarrera =
-            a.carrera === this.studentForm.carrera;
-
-        const mismoPeriodo =
-            a.periodo === activeJ.periodo;
-
-        const mismaJornada =
-            a.jornadaId === activeJ.id;
-
-        return (
-            mismoGrupo &&
-            mismaCarrera &&
-            mismoPeriodo &&
-            mismaJornada
-        );
-    });
+    // Mostrar únicamente las materias de ese grupo
+    return this.asignaciones.filter(a =>
+        a.grupoId === grupoSeleccionado.id &&
+        a.jornadaId === activeJ.id
+    );
 },
+
                 getCurrentAssignment() {
                     const asigs = this.getGroupAssignments();
                     return asigs[this.currentTeacherIndex] || null;
@@ -3288,11 +3391,36 @@ getCompletedEvaluationsCount() {
         p => p.sessionId === activeJ.id
     ).length;
 },
-                getStudentProgressPercentage() {
-                    const total = this.getGroupAssignments().length;
-                    if (total === 0) return 0;
-                    return Math.round(((this.currentTeacherIndex) / total) * 100);
-                },
+               getStudentProgressPercentage() {
+    const totalDocentes = this.getGroupAssignments().length;
+    if (totalDocentes === 0) return 0;
+
+    const preguntas = this.activeQuestions || [];
+    const totalPreguntas = preguntas.length;
+
+    // Docentes que ya terminaron su evaluación
+    const docentesCompletados = this.currentTeacherIndex;
+
+    // Preguntas respondidas del docente actual
+    const preguntasRespondidas = preguntas.filter(pregunta => {
+        const respuesta = this.studentAnswers[pregunta.id];
+
+        return respuesta !== undefined &&
+               respuesta !== null &&
+               String(respuesta).trim() !== '';
+    }).length;
+
+    // Avance dentro del cuestionario actual
+    const avanceActual = totalPreguntas > 0
+        ? preguntasRespondidas / totalPreguntas
+        : 0;
+
+    // Avance general de toda la evaluación
+    const porcentaje =
+        ((docentesCompletados + avanceActual) / totalDocentes) * 100;
+
+    return Math.min(100, Math.max(0, Math.round(porcentaje)));
+},
                 getGroupAnsweredCount(grupo) {
     const jornada = this.getActiveJornada();
 
