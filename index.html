@@ -2989,31 +2989,6 @@ if (indicePendiente === -1) {
                 },
 
               
-getGroupAssignments() {
-    const activeJ = this.getActiveJornada();
-
-    if (!activeJ) {
-        return [];
-    }
-
-    // Identificar el grupo exacto del estudiante
-    const grupoSeleccionado = this.grupos.find(g =>
-        g.carrera === this.studentForm.carrera &&
-        g.nombre === this.studentForm.grupo &&
-        g.activo === true &&
-        g.periodo === activeJ.periodo
-    );
-
-    if (!grupoSeleccionado) {
-        return [];
-    }
-
-    // Mostrar únicamente las materias de ese grupo
-    return this.asignaciones.filter(a =>
-        a.grupoId === grupoSeleccionado.id &&
-        a.jornadaId === activeJ.id
-    );
-},
 
                 getCurrentAssignment() {
                     const asigs = this.getGroupAssignments();
