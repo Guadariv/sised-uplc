@@ -261,7 +261,11 @@
                     </div>
                     <div class="flex items-center space-x-3">
                         <div class="text-right hidden sm:block">
-                            <span class="text-xs font-bold text-slate-700 block" x-text="'Grupo: ' + studentForm.grupo"></span>
+                           
+<span class="text-xs font-bold text-slate-700 block"
+      x-text="'Grupo: ' + (this.grupos.find(g => g.id === studentForm.grupo)?.nombre || '')">
+</span>
+
                             <span class="text-[10px] text-slate-400" x-text="studentForm.carrera"></span>
                         </div>
                         <button @click="tryExitEvaluation()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition cursor-pointer">
@@ -2836,10 +2840,12 @@ if (!activeJ || !activeJ.id) {
     return;
 }
 
-// Obtener el grupo seleccionado
+
+// Obtener el grupo seleccionado por su ID único
 const grupo = this.grupos.find(g =>
-    g.nombre === this.studentForm.grupo
+    g.id === this.studentForm.grupo
 );
+
 
 if (!grupo || !grupo.id) {
     this.showToast('No se encontró el grupo seleccionado.', 'error');
