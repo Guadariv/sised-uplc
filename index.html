@@ -3380,59 +3380,25 @@ getCompletedEvaluationsCount() {
         p => p.sessionId === activeJ.id
     ).length;
 },
-               getStudentProgressPercentage() {
+              
+getStudentProgressPercentage() {
     const totalDocentes = this.getGroupAssignments().length;
-    if (totalDocentes === 0) return 0;
 
-    const preguntas = this.activeQuestions || [];
-    const totalPreguntas = preguntas.length;
+    if (totalDocentes === 0) {
+        return 0;
+    }
 
-    // Docentes que ya terminaron su evaluación
     const docentesCompletados = this.currentTeacherIndex;
 
-    // Preguntas respondidas del docente actual
-    const preguntasRespondidas = preguntas.filter(pregunta => {
-        const respuesta = this.studentAnswers[pregunta.id];
-
-        return respuesta !== undefined &&
-               respuesta !== null &&
-               String(respuesta).trim() !== '';
-    }).length;
-
-    // Avance dentro del cuestionario actual
-    const avanceActual = totalPreguntas > 0
-        ? preguntasRespondidas / totalPreguntas
-        : 0;
-
-    // Avance general de toda la evaluación
     const porcentaje =
-        ((docentesCompletados + avanceActual) / totalDocentes) * 100;
+        (docentesCompletados / totalDocentes) * 100;
 
-    return Math.min(100, Math.max(0, Math.round(porcentaje)));
-},
-                getGroupAnsweredCount(grupo) {
-    const jornada = this.getActiveJornada();
-
-    if (!jornada) return 0;
-
-    const estudiantes = this.participaciones.filter(p =>
-        p.grupo === grupo.nombre &&
-        p.jornada === jornada.nombre &&
-        p.periodo === jornada.periodo
+    return Math.min(
+        100,
+        Math.max(0, Math.round(porcentaje))
     );
-
-    // Contar estudiantes únicos
-    const unicos = new Set(
-        estudiantes.map(p =>
-            p.student_identifier ||
-            p.matricula ||
-            p.correo ||
-            p.id
-        )
-    );
-
-    return unicos.size;
 },
+
 
 getGroupPendingCount(grupo) {
     const esperados = Number(grupo.alumnosEsperados) || 0;
