@@ -2368,32 +2368,35 @@ try {
 // 6. GRUPOS
 // ================================
 try {
-   const { data, error } = await db
-    .from('groups')
-    .select(`
-        id,
-        career_id,
-        period_id,
-        name,
-        term_number,
-        expected_students,
-        careers(id,name),
-        periods(id,name)
-    `)
+    const { data, error } = await db
+        .from('groups')
+        .select(`
+            id,
+            career_id,
+            period_id,
+            name,
+            term_number,
+            expected_students,
+            is_active,
+            careers(id,name),
+            periods(id,name)
+        `)
         .order('term_number');
 
     if (error) throw error;
 
     this.grupos = data.map(g => ({
-    id: g.id,
-    nombre: g.name,
-    cuatrimestre: g.term_number,
-    carrera: g.careers ? g.careers.name : '',
-    carreraId: g.career_id,
-    periodo: g.periods ? g.periods.name : '',
-    periodoId: g.period_id,
-    alumnosEsperados: g.expected_students || 0
-}));
+        id: g.id,
+        nombre: g.name,
+        cuatrimestre: g.term_number,
+        carrera: g.careers ? g.careers.name : '',
+        carreraId: g.career_id,
+        periodo: g.periods ? g.periods.name : '',
+        periodoId: g.period_id,
+        alumnosEsperados: g.expected_students || 0,
+        activo: g.is_active
+    }));
+
     console.log('Grupos cargados:', this.grupos.length);
 
 } catch (error) {
@@ -2754,8 +2757,11 @@ getDashboardJornada() {
                 },
 
                 getAvailableGruposForSelection() {
-                    return this.grupos.filter(g => g.carrera === this.studentForm.carrera);
-                },
+    return this.grupos.filter(g =>
+        g.carrera === this.studentForm.carrera &&
+        g.activo === true
+    );
+},
 
                 updateGruposForCarrera() {
                     const match = this.getAvailableGruposForSelection();
