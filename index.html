@@ -3097,11 +3097,13 @@ try {
         this.studentForm.matricula?.trim() ||
         this.studentForm.correo?.trim();
 
-    // Localizar el grupo real
-    const grupo = this.grupos.find(g =>
-        g.nombre === this.studentForm.grupo &&
-        g.periodo === activeJ.periodo
-    );
+  
+// Localizar el grupo por su ID único
+const grupo = this.grupos.find(g =>
+    g.id === this.studentForm.grupo &&
+    g.periodo === activeJ.periodo
+);
+
 
     if (!grupo) {
         this.showToast(
