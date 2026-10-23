@@ -2604,7 +2604,21 @@ async cargarEvaluacionesAdmin() {
         this.evaluaciones = [];
         return;
     }
+// Cargar participaciones únicamente para administradores autorizados
+const { data: participacionesDB, error: errorParticipaciones } = await db
+    .from('participations')
+    .select('id, session_id, group_id, completed_at');
 
+if (errorParticipaciones) throw errorParticipaciones;
+
+this.participaciones = (participacionesDB || []).map(p => ({
+    id: p.id,
+    sessionId: p.session_id,
+    grupoId: p.group_id,
+    completedAt: p.completed_at
+}));
+
+console.log('Participaciones administrativas cargadas:', this.participaciones.length);
     const { data, error } = await db
         .from('evaluation_responses')
         .select(`
