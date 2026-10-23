@@ -5528,89 +5528,97 @@ if (index !== -1) {
                     this.showToast('Carrera creada.');
                 },
 
-                async saveGrupo() {
+              
+async saveGrupo() {
     try {
-
-        // Buscar carrera seleccionada
         const carrera = this.carreras.find(
             c => c.nombre === this.modalForm.carrera
         );
 
         if (!carrera) {
-            this.showToast(
-                'No se encontró la carrera seleccionada.',
-                'error'
-            );
+            this.showToast('No se encontró la carrera seleccionada.', 'error');
             return;
         }
 
-        // Buscar periodo seleccionado
         const periodo = this.periodosList.find(
             p => p.nombre === this.modalForm.periodo
         );
 
         if (!periodo) {
-            this.showToast(
-                'No se encontró el periodo seleccionado.',
-                'error'
-            );
+            this.showToast('No se encontró el periodo seleccionado.', 'error');
             return;
         }
 
-        // Guardar en Supabase
-        const { data, error } = await db
-            .from('groups')
-           .insert({
-    career_id: carrera.id,
-    period_id: periodo.id,
-    name: this.modalForm.nombre.trim().toUpperCase(),
-    term_number: Number(this.modalForm.cuatrimestre),
-    expected_students: this.modalForm.alumnosEsperados
-        ? Number(this.modalForm.alumnosEsperados)
-        : 0
-})
-            .select(`
-    id,
-    career_id,
-    period_id,
-    name,
-    term_number,
-    expected_students
-`)
-.single();
+        const alumnos = Number(this.modalForm.alumnosEsperados ?? 0);
+
+        if (!Number.isInteger(alumnos) || alumnos < 0) {
+            this.showToast('Ingresa una cantidad válida de alumnos.', 'error');
+            return;
+        }
+
+        const datosGrupo = {
+            career_id: carrera.id,
+            period_id: periodo.id,
+            name: this.modalForm.nombre.trim().toUpperCase(),
+            term_number: Number(this.modalForm.cuatrimestre),
+            expected_students: alumnos
+        };
+
+        const editando = Boolean(this.modalForm.id);
+
+        let consulta = db.from('groups');
+
+        if (editando) {
+            consulta = consulta
+                .update(datosGrupo)
+                .eq('id', this.modalForm.id);
+        } else {
+            consulta = consulta.insert(datosGrupo);
+        }
+
+        const { data, error } = await consulta
+            .select('id, career_id, period_id, name, term_number, expected_students')
+            .single();
 
         if (error) throw error;
 
-        // Mostrarlo inmediatamente en SISED
-    this.grupos.push({
-    id: data.id,
-    nombre: data.name,
-    cuatrimestre: data.term_number,
-    carrera: carrera.nombre,
-    carreraId: data.career_id,
-    periodo: periodo.nombre,
-    periodoId: data.period_id,
-    alumnosEsperados: data.expected_students || 0
-});
+        const grupoActualizado = {
+            id: data.id,
+            nombre: data.name,
+            cuatrimestre: data.term_number,
+            carrera: carrera.nombre,
+            carreraId: data.career_id,
+            periodo: periodo.nombre,
+            periodoId: data.period_id,
+            alumnosEsperados: data.expected_students ?? 0,
+            activo: this.grupos.find(g => g.id === data.id)?.activo ?? true
+        };
+
+        if (editando) {
+            const indice = this.grupos.findIndex(g => g.id === data.id);
+
+            if (indice !== -1) {
+                this.grupos.splice(indice, 1, grupoActualizado);
+            }
+        } else {
+            this.grupos.push(grupoActualizado);
+        }
+
         this.modalActive = false;
 
         this.showToast(
-            'Grupo guardado correctamente.',
+            editando
+                ? 'Grupo actualizado correctamente.'
+                : 'Grupo guardado correctamente.',
             'success'
         );
 
-        console.log('Grupo guardado en Supabase:', data);
-
     } catch (error) {
-
         console.error('Error guardando grupo:', error);
-
-        this.showToast(
-            'No se pudo guardar el grupo.',
-            'error'
-        );
+        this.showToast('No se pudo guardar el grupo.', 'error');
     }
 },
+
   editGrupo(grupo) {
     this.modalType = 'grupo';
     this.modalTitle = 'Editar Grupo';
