@@ -690,7 +690,19 @@
                                                     <td class="py-4 px-6 text-slate-600 font-semibold" x-text="g.cuatrimestre + '°'"></td>
                                                     <td class="py-4 px-6 text-slate-600" x-text="g.carrera"></td>
                                                     <td class="py-4 px-6 text-slate-600" x-text="g.periodo"></td>
-                                                    <td class="py-4 px-6 text-right"><button @click="deleteGrupo(g.id)" class="text-red-600 text-xs cursor-pointer"><i class="fas fa-trash"></i></button></td>
+                                                    <td class="py-4 px-6 text-right"><button
+    @click="editGrupo(g)"
+    class="text-teal-600 text-xs cursor-pointer mr-3"
+    title="Editar grupo">
+    <i class="fas fa-pen"></i>
+</button>
+
+<button
+    @click="deleteGrupo(g.id)"
+    class="text-red-600 text-xs cursor-pointer"
+    title="Eliminar grupo">
+    <i class="fas fa-trash"></i>
+</button></td>
                                                 </tr>
                                             </template>
                                         </tbody>
