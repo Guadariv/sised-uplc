@@ -1048,7 +1048,7 @@
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-slate-100">
-                                            <template x-for="asig in asignaciones" :key="asig.id">
+                                           <template x-for="asig in asignaciones.filter(a => a.periodo === selectedReportPeriod && (!selectedReportTeacher || a.docente === selectedReportTeacher) && (reportScope !== 'specific' || !selectedReportAssignmentId || String(a.id) === String(selectedReportAssignmentId)))" :key="asig.id">
                                                 <tr class="hover:bg-slate-50 transition">
                                                     <td class="py-4 px-6 font-bold text-slate-800" x-text="asig.docente"></td>
                                                     <td class="py-4 px-6 text-slate-600" x-text="asig.carrera"></td>
