@@ -5603,6 +5603,21 @@ if (index !== -1) {
         );
     }
 },
+  editGrupo(grupo) {
+    this.modalType = 'grupo';
+    this.modalTitle = 'Editar Grupo';
+
+    this.modalForm = {
+        id: grupo.id,
+        nombre: grupo.nombre,
+        cuatrimestre: grupo.cuatrimestre,
+        carrera: grupo.carrera,
+        periodo: grupo.periodo,
+        alumnosEsperados: grupo.alumnosEsperados ?? 0
+    };
+
+    this.modalActive = true;
+},              
 editDocente(docente) {
     this.modalType = 'docente';
     this.modalTitle = 'Editar Docente';
