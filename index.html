@@ -3318,18 +3318,25 @@ this.evaluaciones.push({
     }
 },
 getGeneralParticipationPercentage() {
-    const gruposParticipantes = this.getParticipatingGroups();
+    const grupos = this.getParticipatingGroups();
 
-    if (gruposParticipantes.length === 0) return '0.0';
+    if (grupos.length === 0) return '0.0';
 
-    const totalEsperados = gruposParticipantes.reduce(
+    const totalEsperados = grupos.reduce(
         (total, g) => total + Number(g.alumnosEsperados || 0),
         0
     );
 
-    if (totalEsperados === 0) return '0.0';
+    // No calcular porcentajes con datos incompletos
+    const faltanDatos = grupos.some(
+        g => Number(g.alumnosEsperados || 0) <= 0
+    );
 
-    const totalContestadas = gruposParticipantes.reduce(
+    if (faltanDatos || totalEsperados === 0) {
+        return '—';
+    }
+
+    const totalContestadas = grupos.reduce(
         (total, g) => total + this.getGroupAnsweredCount(g),
         0
     );
