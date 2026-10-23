@@ -5608,6 +5608,10 @@ async saveGrupo() {
 
     } catch (error) {
         console.error('Error guardando grupo:', error);
+        console.log('Código del error:', error.code);
+console.log('Mensaje del error:', error.message);
+console.log('Detalles del error:', error.details);
+console.log('Sugerencia:', error.hint);
         this.showToast('No se pudo guardar el grupo.', 'error');
     }
 },
