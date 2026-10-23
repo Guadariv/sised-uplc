@@ -3426,7 +3426,17 @@ getGroupPendingCount(grupo) {
 
     return Math.max(esperados - contestadas, 0);
 },
+getGroupAnsweredCount(grupo) {
+    const activeJ = this.getDashboardJornada();
 
+    if (!activeJ || !grupo) return 0;
+
+    return this.participaciones.filter(p =>
+        p.sessionId === activeJ.id &&
+        p.grupoId === grupo.id &&
+        p.completedAt != null
+    ).length;
+},
 getGroupParticipationPercentage(grupo) {
     const esperados = Number(grupo.alumnosEsperados) || 0;
     const contestadas = this.getGroupAnsweredCount(grupo);
