@@ -3392,11 +3392,11 @@ getCompletedEvaluationsCount() {
 
     if (!activeJ) return 0;
 
-    return this.participaciones.filter(
-        p => p.sessionId === activeJ.id
+    return this.participaciones.filter(p =>
+        p.sessionId === activeJ.id &&
+        p.completedAt != null
     ).length;
-},
-              
+},            
 getStudentProgressPercentage() {
     const totalDocentes = this.getGroupAssignments().length;
 
